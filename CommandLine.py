@@ -2,7 +2,7 @@ import datetime
 import urllib3
 from getpass import getpass
 
-url = "http://192.168.31.43:8085/StoreAPI.php"
+url = "php-api-url-here"
 
 
 # function to get a date from user
@@ -67,7 +67,6 @@ def addSalesEntry():
         allItems = ""
         for x in range(len(itemCodes)):
             allItems += itemCodes[x] + "x" + itemCounts[x] + ","
-        print(allItems)
         print(f'Transaction total: {useAPI("GET", f"?user={username}&pass={password}&purp=s&items={allItems}")} €')
         if input("Create another PURCHASE? Leave empty to create, anyting else to exit: ") != "":
             break
@@ -100,13 +99,10 @@ leave blank to exit
                 break
             
             case "0":
-                # DONE!
                 showTotal()
             case "1":
-                # DONE!
                 addSalesEntry()
             case "2":
-                # DONE!
                 addRestockEntry()
             case _:
                 print("This is not a defined function! Please try again.")
