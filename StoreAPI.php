@@ -3,8 +3,8 @@
 // Connection preferences
 $servername = "db";
 $dbname = "StoreManager";
-$username = "StoreUser";
-$password = "Store-2024!";
+$username = "username";
+$password = "password";
 
 $user = $pass = $purp = $role = "";
 
@@ -21,7 +21,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET"){
 }
 
 $loginstring = openssl_encrypt($pass, "AES-128-CTR", $user, 0, "-%1+4@c=~~cT3LXA");
-//echo $loginstring;
+//echo $loginstring; // in case of creating new user
 
 // Create and test connection
 $conn = new mysqli($servername, $username, $password, $dbname);
