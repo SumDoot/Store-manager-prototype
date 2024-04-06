@@ -57,16 +57,31 @@ def showTotal():
 # function for adding purchases
 def addSalesEntry():
     while True:
-        print("adding sales entry...")
-        if input("add another? leave empty continue, anyting else to exit: ") != "":
+        itemCodes = []
+        itemCounts = []
+        while True:
+            itemCodes.append(input("Enter item code: "))
+            itemCounts.append(input("Enter item count: "))
+            if input("Add another PRODUCT? Leave empty to add another, anyting else to exit: ") != "":
+                break
+        allItems = ""
+        for x in range(len(itemCodes)):
+            allItems += itemCodes[x] + "x" + itemCounts[x] + ","
+        print(allItems)
+        print(f'Transaction total: {useAPI("GET", f"?user={username}&pass={password}&purp=s&items={allItems}")} €')
+        if input("Create another PURCHASE? Leave empty to create, anyting else to exit: ") != "":
             break
 
 
 # function for adding restocks
 def addRestockEntry():
     while True:
-        print("adding restock entry...")
-        if input("add another? leave empty continue, anyting else to exit: ") != "":
+        itemCode = input("Enter item code: ")
+        itemCount = input("Enter item count: ")
+        itemPrice = input("Enter item price (format as 123.45): ")
+        print(useAPI("GET", f"?user={username}&pass={password}&purp=r&item={itemCode}&count={itemCount}&price={itemPrice}"))
+        print("Added restocking entry.")
+        if input("Add another? Leave empty to add, anyting else to exit: ") != "":
             break
 
 
@@ -88,10 +103,10 @@ leave blank to exit
                 # DONE!
                 showTotal()
             case "1":
-                # NOT DONE
+                # DONE!
                 addSalesEntry()
             case "2":
-                # NOT DONE
+                # DONE!
                 addRestockEntry()
             case _:
                 print("This is not a defined function! Please try again.")
