@@ -1,36 +1,72 @@
 import datetime
 import urllib3
+from getpass import getpass
 
 url = "http://192.168.31.43:8085/StoreAPI.php"
 
 
-# function to convert date to a desireable format
-def parseDate(date, isStart):
+# function to get a date from user
+def GetDate():
     try:
-        if isStart:
-            return str(datetime.datetime.strptime(date + " 00:00", '%d.%m.%Y %H:%M')).replace(" ", "T")
+        endDate = input("Input end date (format DD.MM.YYYY) or today (t): ")
+        if endDate == "t":
+            endDate = datetime.date.today()
         else:
-            return str(datetime.datetime.strptime(date + " 23:59", '%d.%m.%Y %H:%M')).replace(" ", "T")
+            endDate = datetime.datetime.strptime(endDate + " 23:59", '%d.%m.%Y %H:%M')
+
+        print("Input start date (format DD.MM.YYYY) or period")
+        startDate = input("(t - today, d - day, w - week, m - month, y - year): ")
+        match startDate:
+            case "t":
+                startDate = datetime.date.today().strftime("%d.%m.%Y")
+            case "d":
+                startDate = endDate.strftime("%d.%m.%Y")
+            case "w":
+                startDate = endDate - datetime.timedelta(days=7)
+                startDate = startDate.strftime("%d.%m.%Y")
+            case "m":
+                startDate = endDate - datetime.timedelta(days=30)
+                startDate = startDate.strftime("%d.%m.%Y")
+            case "y":
+                startDate = endDate - datetime.timedelta(days=365)
+                startDate = startDate.strftime("%d.%m.%Y")
+
+        endDate = str(datetime.datetime.strptime(endDate.strftime("%d.%m.%Y") + " 23:59", '%d.%m.%Y %H:%M')).replace(" ", "T")
+        startDate = str(datetime.datetime.strptime(startDate + " 00:00", '%d.%m.%Y %H:%M')).replace(" ", "T")
+        return startDate + ","+ endDate
+
     except ValueError:
         print("Invalid format! Please try again!")
-        return parseDate(input("Input date (format DD.MM.YYYY): "), isStart)
+        return GetDate()
 
 
 # function to get data from API
-def useAPI(RequestType, FullURL):
-    return urllib3.PoolManager().request(RequestType, FullURL).data.decode("utf-8")
+def useAPI(RequestType, tagsOnlyURL):
+    return urllib3.PoolManager().request(RequestType, url + tagsOnlyURL).data.decode("utf-8")
 
 
 # function for showing income / spendings / total
-def showTotal(startDate, endDate):
-    print(f"Data from {startDate} to {endDate}")
+def showTotal():
+    Dates = GetDate().split(",")
+
+    print(f"Data from {Dates[0]} to {Dates[1]}")
+    totals = useAPI("GET", f"?user={username}&pass={password}&purp=g&starttime={Dates[0]}&endtime={Dates[1]}").split(",")
+    print(f"Profit: {totals[0]}€, Loss: {totals[1]}€, Total: {totals[2]}€")
 
 
 # function for adding purchases
 def addSalesEntry():
     while True:
         print("adding sales entry...")
-        if input("add another? leave empty continue: ") != "":
+        if input("add another? leave empty continue, anyting else to exit: ") != "":
+            break
+
+
+# function for adding restocks
+def addRestockEntry():
+    while True:
+        print("adding restock entry...")
+        if input("add another? leave empty continue, anyting else to exit: ") != "":
             break
 
 
@@ -49,26 +85,28 @@ leave blank to exit
                 break
             
             case "0":
-                showTotal(parseDate(input("Input start date (format DD.MM.YYYY): "), True), parseDate(input("Input end date(format DD.MM.YYYY): "), False))
-
+                # DONE!
+                showTotal()
             case "1":
+                # NOT DONE
                 addSalesEntry()
-
             case "2":
-                print("doing no munei ad produc...")
-
+                # NOT DONE
+                addRestockEntry()
             case _:
                 print("This is not a defined function! Please try again.")
 
 
-# ----- MAIN CODE -----
+# -----------------------------------------
+# --------------- MAIN CODE ---------------
+# -----------------------------------------
 
 
 # authenticate user
 while True:
     username = input("Enter username: ")
-    password = input("Enter password: ")
-    userRole = useAPI("GET", url + f"?user={username}&pass={password}&purp=a")
+    password = getpass("Enter password: ")
+    userRole = useAPI("GET", f"?user={username}&pass={password}&purp=a")
 
     match userRole:
         case "Pardevejs":
