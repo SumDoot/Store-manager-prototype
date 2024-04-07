@@ -78,7 +78,7 @@ def addRestockEntry():
         itemCode = input("Enter item code: ")
         itemCount = input("Enter item count: ")
         itemPrice = input("Enter item price (format as 123.45): ")
-        print(useAPI("GET", f"?user={username}&pass={password}&purp=r&item={itemCode}&count={itemCount}&price={itemPrice}"))
+        useAPI("GET", f"?user={username}&pass={password}&purp=r&item={itemCode}&count={itemCount}&price={itemPrice}")
         print("Added restocking entry.")
         if input("Add another? Leave empty to add, anyting else to exit: ") != "":
             break
